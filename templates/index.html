@@ -1,80 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Socket Communication</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
     <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">Server</h2>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="serverMessage" placeholder="Type your message">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" onclick="sendServerMessage()">Send Message</button>
-                            </div>
-                        </div>
-                        <ul class="list-group" id="serverMessages"></ul>
-                    </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title">Server</h2>
+              <div class="input-group mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="serverMessage"
+                  placeholder="Type your message"
+                />
+                <div class="input-group-append">
+                  <button class="btn btn-primary" onclick="sendServerMessage()">
+                    Send Message
+                  </button>
                 </div>
+              </div>
+              <ul class="list-group" id="serverMessages"></ul>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">Client</h2>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="clientMessage" placeholder="Type your message">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" onclick="sendClientMessage()">Send Message</button>
-                            </div>
-                        </div>
-                        <ul class="list-group" id="clientMessages"></ul>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title">Client</h2>
+              <div class="input-group mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="clientMessage"
+                  placeholder="Type your message"
+                />
+                <div class="input-group-append">
+                  <button class="btn btn-primary" onclick="sendClientMessage()">
+                    Send Message
+                  </button>
+                </div>
+              </div>
+              <ul class="list-group" id="clientMessages"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+      var socket = io.connect(
+        "http://" + document.domain + ":" + location.port
+      );
 
-        function sendServerMessage() {
-            const message = document.getElementById('serverMessage').value;
-            socket.emit('message_from_server', message);
-            document.getElementById('serverMessage').value = '';
-        }
+      function sendServerMessage() {
+        const message = document.getElementById("serverMessage").value;
+        socket.emit("message_from_server", message);
+        document.getElementById("serverMessage").value = "";
+      }
 
-        function sendClientMessage() {
-            const message = document.getElementById('clientMessage').value;
-            socket.emit('message_from_client', message);
-            document.getElementById('clientMessage').value = '';
-        }
+      function sendClientMessage() {
+        const message = document.getElementById("clientMessage").value;
+        socket.emit("message_from_client", message);
+        document.getElementById("clientMessage").value = "";
+      }
 
-        socket.on('message_from_server', function(message) {
-            var ul = document.getElementById('serverMessages');
-            var li = document.createElement('li');
-            li.className = 'list-group-item';
-            li.appendChild(document.createTextNode(message));
-            ul.appendChild(li);
-        });
+      socket.on("message_from_server", function (message) {
+        var ul = document.getElementById("serverMessages");
+        var li = document.createElement("li");
+        li.className = "list-group-item";
+        li.appendChild(document.createTextNode(message));
+        ul.appendChild(li);
+      });
 
-        socket.on('message_from_client', function(message) {
-            var ul = document.getElementById('clientMessages');
-            var li = document.createElement('li');
-            li.className = 'list-group-item';
-            li.appendChild(document.createTextNode(message));
-            ul.appendChild(li);
-        });
+      socket.on("message_from_client", function (message) {
+        var ul = document.getElementById("clientMessages");
+        var li = document.createElement("li");
+        li.className = "list-group-item";
+        li.appendChild(document.createTextNode(message));
+        ul.appendChild(li);
+      });
     </script>
-</body>
+  </body>
 </html>

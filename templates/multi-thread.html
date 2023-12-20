@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #chat-container {
+            width: 500px;
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div id="chat-container" style="display: none;">
+            <h3>Chat Room</h3>
+            <ul class="list-group" id="chatMessages"></ul>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="messageInput" placeholder="Type your message">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+                </div>
+            </div>
+        </div>
+        <div id="username-container">
+            <h3>Enter Your Username</h3>
+            <input type="text" class="form-control" id="usernameInput" placeholder="Your Username">
+            <button class="btn btn-primary mt-3" onclick="joinChat()">Join Chat</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        var username;
+
+        function joinChat() {
+            username = document.getElementById('usernameInput').value;
+            if (username.trim() === '') {
+                alert('Please enter a valid username.');
+                return;
+            }
+
+            socket.emit('user_joined', {'username': username});
+            document.getElementById('chat-container').style.display = 'block';
+            document.getElementById('username-container').style.display = 'none';
+        }
+
+        function sendMessage() {
+            var message = document.getElementById('messageInput').value;
+            if (message.trim() !== '') {
+                socket.emit('send_message', {'username': username, 'message': message});
+                document.getElementById('messageInput').value = '';
+            }
+        }
+
+        socket.on('message', function(data) {
+            var ul = document.getElementById('chatMessages');
+            var li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.appendChild(document.createTextNode(data['username'] + ': ' + data['message']));
+            ul.appendChild(li);
+        });
+
+        // Sayfa yüklendiğinde otomatik olarak kullanıcı adı sorulsun
+        window.onload = function() {
+            document.getElementById('username-container').style.display = 'block';
+        };
+    </script>
+</body>
+</html>
