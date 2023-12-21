@@ -1,59 +1,59 @@
-from flask import Flask, render_template, request
-from flask_socketio import SocketIO
+from flask import Flask, render_template, request, session
+from flask_socketio import SocketIO, join_room, leave_room
 import requests
-import time
-app = Flask(__name__)
-socketio = SocketIO(app)
 import threading
+import os
 
 # API key ve base URL
-ACCESS_KEY = '70b44b807114df0f9eb8ca113951ad86'
+# file deepcode ignore HardcodedNonCryptoSecret: <NOT IMPORTANT>
+ACCESS_KEY = '771d3c616913e1236e2b3d9845f6d3ac' # FREE PLAN 1000 request / month (change this)
 URL = f'http://data.fixer.io/api/latest?access_key={ACCESS_KEY}'
+
+app = Flask(__name__)
+socketio = SocketIO(app)
+
 
 def get_exchange_rate(from_currency, to_currency):
     response = requests.get(URL)
     rates = response.json()['rates']
-    
-    if from_currency == 'EUR':
-        rate = rates[to_currency]
-    elif to_currency == 'EUR':
-        rate = 1 / rates[from_currency]
-    else:
-        rate = rates[to_currency] / rates[from_currency]
+
+    rate = rates[to_currency] / rates[from_currency]
 
     return rate
 
 def update_exchange_rate():
     while True:
-        rate = get_exchange_rate("USD", "TRY")
-        converted_amount = round(rate, 5)
-        print(converted_amount)
-        socketio.emit('update_rate', {'rate': converted_amount})
-        time.sleep(10)  # Örneğin, her dakikada bir güncelle
+        usd_try_rate = get_exchange_rate("USD", "TRY")
+        eur_try_rate = get_exchange_rate("EUR", "TRY")
+        print("USD/TRY: ", round(usd_try_rate, 5))
+        print("EUR/TRY: ", round(eur_try_rate, 5))
 
-        
-
-@app.route('/convert')
-def convert():
-    #from_currency = request.form['from_currency']
-    #to_currency = request.form['to_currency']
-    #amount = float(request.form['amount'])
-    #from_currency = "USD"
-    #to_currency = "TRY"
-    #amount=1
-    return render_template('result.html')
+        socketio.emit('update_rate_usd_try', {'rate': round(usd_try_rate, 5)})
+        socketio.emit('update_rate_eur_try', {'rate': round(eur_try_rate, 5)})
+        socketio.sleep(2)  
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def home():
+    return render_template('home.html')
 
-@app.route('/multi-thread')
+@app.route('/dynamic')
+def convert():
+    return render_template('dynamic.html')
+
+@app.route('/static')
+def index():
+    return render_template('static.html')
+
+@app.route('/multi_thread')
 def multi_thread():
+    if 'username' in session:
+        return render_template('multi-thread.html', username=session['username'])
     return render_template('multi-thread.html')
 
-# @app.route('/dynamic')
-# def dynamic():
-#     return render_template('result.html')
+@app.route('/client_server')
+def client_server():
+    return render_template('client_server.html')
+
 
 @socketio.on('message_from_client')
 def handle_message_from_client(message):
@@ -66,17 +66,22 @@ def handle_message_from_server(message):
     socketio.emit('message_from_client', f"Client says: {message}")
 
 @socketio.on('user_joined')
-def handle_user_joined(username):
-    socketio.emit('message', {'username': 'SERVER', 'message': f'{username} joined the chat'})
+def handle_user_joined(data):
+    username = data['username']
+    message = f'{username} joined the chat'
+    socketio.emit('message', {'username': 'SERVER', 'message': message})
 
 @socketio.on('send_message')
 def handle_send_message(data):
     socketio.emit('message', data)
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    leave_room('chat')
 
 if __name__ == '__main__':
-    
     # Arka planda oranı güncelleyen bir thread başlat
+    # file deepcode ignore MissingAPI: <NOT IMPORTANT>
     update_thread = threading.Thread(target=update_exchange_rate)
     update_thread.daemon = True
     update_thread.start()

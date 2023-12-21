@@ -27,3 +27,5 @@ python app.py
 Tarayıcınızda http://127.0.0.1:5000 adresine gidin.
 
 Web sayfasındaki "Server" ve "Client" panelleri arasında etkileşim sağlayın.
+
+NOT: Döviz API bilgileri ```https://fixer.io/``` sitesinden çekilmiştir.
