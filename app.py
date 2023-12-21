@@ -85,4 +85,4 @@ if __name__ == '__main__':
     update_thread = threading.Thread(target=update_exchange_rate)
     update_thread.daemon = True
     update_thread.start()
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
