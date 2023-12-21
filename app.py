@@ -6,14 +6,12 @@ import os
 
 # API key ve base URL
 # file deepcode ignore HardcodedNonCryptoSecret: <NOT IMPORTANT>
-ACCESS_KEY = '970ef16acdcd560bb68273408984fa9f'
+ACCESS_KEY = '771d3c616913e1236e2b3d9845f6d3ac' # FREE PLAN 1000 request / month (change this)
 URL = f'http://data.fixer.io/api/latest?access_key={ACCESS_KEY}'
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'server')
-app = Flask(__name__, template_folder="templates")
 
 def get_exchange_rate(from_currency, to_currency):
     response = requests.get(URL)
@@ -51,6 +49,10 @@ def multi_thread():
     if 'username' in session:
         return render_template('multi-thread.html', username=session['username'])
     return render_template('multi-thread.html')
+
+@app.route('/client_server')
+def client_server():
+    return render_template('client_server.html')
 
 
 @socketio.on('message_from_client')
