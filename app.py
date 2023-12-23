@@ -6,7 +6,7 @@ import os
 
 # API key ve base URL
 # file deepcode ignore HardcodedNonCryptoSecret: <NOT IMPORTANT>
-ACCESS_KEY = '771d3c616913e1236e2b3d9845f6d3ac' # FREE PLAN 1000 request / month (change this)
+ACCESS_KEY = '245383253985b67cbd688b5eb02fc79c' # FREE PLAN 1000 request / month (change this)
 URL = f'http://data.fixer.io/api/latest?access_key={ACCESS_KEY}'
 
 app = Flask(__name__)
@@ -30,7 +30,7 @@ def update_exchange_rate():
 
         socketio.emit('update_rate_usd_try', {'rate': round(usd_try_rate, 5)})
         socketio.emit('update_rate_eur_try', {'rate': round(eur_try_rate, 5)})
-        socketio.sleep(2)  
+        socketio.sleep(5)  
 
 @app.route('/')
 def home():

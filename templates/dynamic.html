@@ -1,133 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Real-Time Exchange Rates</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
     <style>
-        body {
-            padding: 20px;
-            background-color: #f8f9fa; /* Gri background */
-        }
+      body {
+        padding: 20px;
+        background-color: #f8f9fa; /* Gri background */
+      }
 
-        h1 {
-            color: #343a40;
-        }
+      .container {
+        max-width: 2400px;
+        max-height: 800px;
+        background-color: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 20px auto;
+        display: flex;
+        flex-direction: column;
+      }
 
-        .container {
-            max-width: 2400px; 
-            max-height: 800px; 
-            background-color: #ffffff; 
-            border-radius: 20px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-            padding: 20px; 
-            margin: 20px auto; 
-        }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-        .table {
-            width: 100%; 
-            border-collapse: collapse; 
-        }
+      .table th,
+      .table td {
+        text-align: center;
+        padding: 15px;
+        font-size: 16px;
+      }
 
-        .table th, .table td {
-            text-align: center; 
-            border-radius: 20px; 
-            padding: 15px; 
-        }
-
-        .thead-dark th {
-            border: none; 
-        }
-
-        .increase { color: #28a745; } 
-        .decrease { color: #dc3545; } 
-        .exchangeRate {
-            font-size: 1.5em; 
-        }    
-        .currencyPair {
-            font-size: 2em; 
-            font-weight: bold; 
-        }
-        .liveTime {
-            position: absolute; 
-            right: 40px; 
-            font-size: 1.2em; 
-            top: 310px;
-            
-        }
+      .increase {
+        color: #28a745;
+      }
+      .decrease {
+        color: #dc3545;
+      }
+      .exchangeRate {
+        font-size: 1.5em;
+      }
+      .currencyPair {
+        font-size: 2em;
+        font-weight: bold;
+      }
     </style>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Real-Time Exchange Rates</h1>
-        <table class="table table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Currency Pair</th>
-                    <th scope="col">Exchange Rate</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="usdTry">
-                    <th scope="row">USD/TRY</th>
-                    <td class="exchangeRate">Loading...</td>
-                </tr>
-                <tr id="eurTry">
-                    <th scope="row">EUR/TRY</th>
-                    <td class="exchangeRate">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="liveTime" id="liveTime"></div>
+      <h5 class="">Real-Time Exchange Rates</h5>
+      <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Currency Pair</th>
+            <th scope="col">Exchange Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="usdTry">
+            <th scope="row">USD/TRY</th>
+            <td class="exchangeRate">Loading...</td>
+          </tr>
+          <tr id="eurTry">
+            <th scope="row">EUR/TRY</th>
+            <td class="exchangeRate">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        class="d-flex justify-content-end font-weight-bold"
+        id="liveTime"
+      ></div>
     </div>
 
-    
     <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+      var socket = io.connect(
+        "http://" + document.domain + ":" + location.port
+      );
 
-        function updateExchangeRate(pair, data) {
-            var exchangeRateElement = document.getElementById(pair);
-            var previousRate = parseFloat(exchangeRateElement.dataset.previousRate) || 0;
-            var currentRate = parseFloat(data.rate);
+      function updateExchangeRate(pair, data) {
+        var exchangeRateElement = document.getElementById(pair);
+        var previousRate =
+          parseFloat(exchangeRateElement.dataset.previousRate) || 0;
+        var currentRate = parseFloat(data.rate);
 
-            exchangeRateElement.querySelector('.exchangeRate').innerText = data.rate;
-            exchangeRateElement.classList.add(colorClass);
+        exchangeRateElement.querySelector(".exchangeRate").innerText =
+          data.rate;
 
-            setTimeout(function() {
-                exchangeRateElement.classList.remove('increase', 'decrease');
-                exchangeRateElement.dataset.previousRate = currentRate;
-            }, 1000);
-        }
+        setTimeout(function () {
+          exchangeRateElement.classList.remove("increase", "decrease");
+          exchangeRateElement.dataset.previousRate = currentRate;
+        }, 1000);
+      }
 
-        function updateLiveTime() {
-            var currentTime = new Date();
-            var hours = currentTime.getHours();
-            var minutes = currentTime.getMinutes();
-            var seconds = currentTime.getSeconds();
+      function updateLiveTime() {
+        var currentTime = new Date();
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        var seconds = currentTime.getSeconds();
 
-            hours = (hours < 10 ? "0" : "") + hours;
-            minutes = (minutes < 10 ? "0" : "") + minutes;
-            seconds = (seconds < 10 ? "0" : "") + seconds;
+        hours = (hours < 10 ? "0" : "") + hours;
+        minutes = (minutes < 10 ? "0" : "") + minutes;
+        seconds = (seconds < 10 ? "0" : "") + seconds;
 
-            document.getElementById("liveTime").innerHTML = hours + ":" + minutes + ":" + seconds;
-        }
+        document.getElementById("liveTime").innerHTML =
+          hours + ":" + minutes + ":" + seconds;
+      }
 
-        setInterval(updateLiveTime, 1000);
+      setInterval(updateLiveTime, 1000);
 
-        // SocketIO'dan gelen 'update_rate' olayını dinle
-        socket.on('update_rate_usd_try', function(data) {
-            updateExchangeRate('usdTry', data);
-        });
+      // SocketIO'dan gelen 'update_rate' olayını dinle
+      socket.on("update_rate_usd_try", function (data) {
+        updateExchangeRate("usdTry", data);
+      });
 
-        socket.on('update_rate_eur_try', function(data) {
-            updateExchangeRate('eurTry', data);
-        });
+      socket.on("update_rate_eur_try", function (data) {
+        updateExchangeRate("eurTry", data);
+      });
     </script>
-</body>
+  </body>
 </html>
