@@ -97,6 +97,9 @@
             var currentRate = parseFloat(data.rate);
 
             exchangeRateElement.querySelector('.exchangeRate').innerText = data.rate;
+
+            var colorClass = currentRate > previousRate ? 'increase' : (currentRate < previousRate ? 'decrease' : '');
+
             exchangeRateElement.classList.add(colorClass);
 
             setTimeout(function() {
@@ -104,6 +107,15 @@
                 exchangeRateElement.dataset.previousRate = currentRate;
             }, 1000);
         }
+
+        // SocketIO'dan gelen 'update_rate' olayını dinle
+        socket.on('update_rate_usd_try', function(data) {
+            updateExchangeRate('usdTry', data);
+        });
+
+        socket.on('update_rate_eur_try', function(data) {
+            updateExchangeRate('eurTry', data);
+        });
 
         function updateLiveTime() {
             var currentTime = new Date();
@@ -120,14 +132,7 @@
 
         setInterval(updateLiveTime, 1000);
 
-        // SocketIO'dan gelen 'update_rate' olayını dinle
-        socket.on('update_rate_usd_try', function(data) {
-            updateExchangeRate('usdTry', data);
-        });
-
-        socket.on('update_rate_eur_try', function(data) {
-            updateExchangeRate('eurTry', data);
-        });
+        
     </script>
 </body>
 </html>

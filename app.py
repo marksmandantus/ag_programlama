@@ -2,13 +2,13 @@ from flask import Flask, render_template, request, session
 from flask_socketio import SocketIO, join_room, leave_room
 import requests
 import threading
-import os
 
 # API key ve base URL
 # file deepcode ignore HardcodedNonCryptoSecret: <NOT IMPORTANT>
-ACCESS_KEY = '771d3c616913e1236e2b3d9845f6d3ac' # FREE PLAN 1000 request / month (change this)
+ACCESS_KEY = '7d8a1d5aa550bf26453c1e658ff782e0' # FREE PLAN 1000 request / month (change this)
 URL = f'http://data.fixer.io/api/latest?access_key={ACCESS_KEY}'
 
+# 7d8a1d5aa550bf26453c1e658ff782e0
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -85,4 +85,4 @@ if __name__ == '__main__':
     update_thread = threading.Thread(target=update_exchange_rate)
     update_thread.daemon = True
     update_thread.start()
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True) # PC Bağlantısı
